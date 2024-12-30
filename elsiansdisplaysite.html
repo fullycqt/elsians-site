@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Era Clock</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      color: #fff;
+      background: #222;
+    }
+    .landing-page, .clock-page {
+      height: 100vh;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+    }
+    .landing-page {
+      background: url('background.jpg') no-repeat center center/cover;
+    }
+    .title {
+      font-size: 3rem;
+      font-weight: bold;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+    }
+    .enter-button {
+      margin-top: 20px;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #fff;
+      background-color: #ff4500;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+    .enter-button:hover {
+      background-color: #e63900;
+      transform: scale(1.05);
+    }
+    .clock-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      background: #333;
+      border: 8px solid #555;
+      border-radius: 50%;
+      margin-bottom: 20px;
+    }
+    .clock-face {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .clock-hand {
+      position: absolute;
+      width: 6px;
+      height: 40%;
+      background: #ff4500;
+      transform-origin: bottom center;
+      transform: rotate(270deg); /* Start pointing at 1950 */
+      border-radius: 3px;
+      left: 50%;
+      bottom: 50%;
+      cursor: pointer;
+    }
+    .clock-number {
+      position: absolute;
+      font-size: 1.2rem;
+      color: #fff;
+      font-weight: bold;
+      transform: translate(-50%, -50%);
+    }
+    .secret-era-button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #fff;
+      background-color: #4caf50;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+    .secret-era-button:hover {
+      background-color: #388e3c;
+      transform: scale(1.05);
+    }
+    .popup-container {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    .popup {
+      background: #333;
+      color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      width: 70%;
+      max-width: 600px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transform: translateY(100%);
+      animation: slideUp 0.4s forwards;
+    }
+    .popup h2 {
+      margin-bottom: 20px;
+    }
+    .popup button {
+      background-color: #ff4500;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .popup button:hover {
+      background-color: #e63900;
+    }
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+      }
+      to {
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Landing Page -->
+  <div class="landing-page" id="landingPage">
+    <div class="title">Welcome to 6B Display</div>
+    <button class="enter-button" onclick="enterSite()">Enter</button>
+  </div>
+
+  <!-- Clock Page -->
+  <div class="clock-page" id="clockPage" style="display: none;">
+    <div class="clock-container">
+      <div class="clock-face" id="clockFace">
+        <div class="clock-hand" id="clockHand"></div>
+        <div class="clock-number" style="top: 10%; left: 50%;">1950</div>
+        <div class="clock-number" style="top: 25%; left: 85%;">1960</div>
+        <div class="clock-number" style="top: 50%; left: 90%;">1970</div>
+        <div class="clock-number" style="top: 75%; left: 85%;">1980</div>
+        <div class="clock-number" style="top: 90%; left: 50%;">1990</div>
+        <div class="clock-number" style="top: 75%; left: 15%;">2010</div>
+        <div class="clock-number" style="top: 50%; left: 10%;">2020</div>
+        <div class="clock-number" style="top: 25%; left: 15%;">2025</div>
+      </div>
+    </div>
+    <button class="secret-era-button" onclick="openSecretEra()">Secret Era</button>
+  </div>
+
+  <!-- Era Confirmation Popup -->
+  <div class="popup-container" id="popupContainer">
+    <div class="popup">
+      <h2 id="popupMessage">Are you sure you want to enter this era?</h2>
+      <button onclick="closePopup()">Cancel</button>
+      <button onclick="enterEra()">Enter Era</button>
+    </div>
+  </div>
+
+  <script>
+    function enterSite() {
+      document.getElementById('landingPage').style.display = 'none';
+      document.getElementById('clockPage').style.display = 'flex';
+    }
+
+    const eras = {
+      1950: 270,
+      1960: 315,
+      1970: 0,
+      1980: 45,
+      1990: 90,
+      2010: 135,
+      2020: 180,
+      2025: 225,
+    };
+
+    const infoText = {
+      1950: "The 1950s: Post-war boom, rise of rock 'n' roll.",
+      1960: "The 1960s: Counterculture, moon landing, civil rights.",
+      1970: "The 1970s: Disco, Vietnam War ends, rise of tech.",
+      1980: "The 1980s: Neon culture, Cold War, personal computers.",
+      1990: "The 1990s: Internet boom, grunge, globalization.",
+      2010: "The 2010s: Social media era, smart devices.",
+      2020: "The 2020s: Pandemic, AI evolution.",
+      2025: "The 2025s: Speculative future trends!",
+    };
+
+    const clockHand = document.getElementById('clockHand');
+    const popupContainer = document.getElementById('popupContainer');
+    const popupMessage = document.getElementById('popupMessage');
+    const clockFace = document.getElementById('clockFace');
+
+    let isDragging = false;
+    let currentAngle = 270;
+
+    clockHand.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      const rect = clockFace.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      const onMouseMove = (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - centerX;
+        const dy = e.clientY - centerY;
+        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+        currentAngle = (angle + 360) % 360;
+        clockHand.style.transform = `rotate(${currentAngle}deg)`;
+      };
+
+      const onMouseUp = () => {
+        isDragging = false;
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+
+        // Find the closest era
+        const closest = Object.entries(eras).reduce((closest, [era, eraAngle]) => {
+          const diff = Math.abs(eraAngle - currentAngle);
+          return diff < closest.diff ? { era, diff } : closest;
+        }, { era: null, diff: Infinity });
+
+        currentAngle = eras[closest.era];
+        clockHand.style.transform = `rotate(${currentAngle}deg)`;
+
+        popupMessage.textContent = `Are you sure you want to enter the ${closest.era} era?`;
+        popupContainer.style.display = 'flex';
+      };
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
+
+    function closePopup() {
+      popupContainer.style.display = 'none';
+    }
+
+    function enterEra() {
+      alert(infoText[closest.era]);
+      closePopup();
+    }
+
+    function openSecretEra() {
+      window.location.href = "file:///C:/Users/egypt2/Downloads/yasofaso.html"; // Replace with your actual URL
+    }
+  </script>
+</body>
+</html>
